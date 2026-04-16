@@ -1,31 +1,36 @@
 ﻿namespace CSharpDictionary.Core;
 
-public class MyDictionary<Tkey, Tvalue>
+public class MyDictionary<TKey , Tvalue>
 {
 	private const int DefaultCapacity = 16;
 
-	private readonly LinkedList<KeyValuePair<Tkey, Tvalue>> ?[] _buckets;
+	private readonly LinkedList<KeyValuePair<TKey , Tvalue>> ?[] _buckets;
+	
+	public int Count { get; private set; }
+	
 	
 	public MyDictionary()
 	{
-		_buckets = new LinkedList<KeyValuePair<Tkey, Tvalue>>[DefaultCapacity];
+		_buckets = new LinkedList<KeyValuePair<TKey , Tvalue>>[DefaultCapacity];
 	}
 
-	private int GetBucketIndex(Tkey key)
+	private int GetBucketIndex(TKey  key)
 	{
 		int hash = key!.GetHashCode();
 		return Math.Abs(hash) % _buckets.Length;
 	}
 
-	public void Add(Tkey key, Tvalue value)
+	public void Add(TKey  key, Tvalue value)
 	{
 		int index = GetBucketIndex(key);
 
-		_buckets[index] ??= new LinkedList<KeyValuePair<Tkey, Tvalue>>();
-		_buckets[index]!.AddLast(new KeyValuePair<Tkey, Tvalue>(key, value));
+		_buckets[index] ??= new LinkedList<KeyValuePair<TKey , Tvalue>>();
+		_buckets[index]!.AddLast(new KeyValuePair<TKey , Tvalue>(key, value));
+		
+		Count++;
 	}
 
-	public Tvalue Get(Tkey key)
+	public Tvalue Get(TKey  key)
 	{
 		int index = GetBucketIndex(key);
 		var bucket = _buckets[index];
@@ -37,7 +42,41 @@ public class MyDictionary<Tkey, Tvalue>
 
 		throw new KeyNotFoundException($"Key {key} not found");
 	}
-	
-	
+
+	public bool ContainsKey(TKey  key)
+	{
+		int index = GetBucketIndex(key);
+		var bucket = _buckets[index];
+		
+		if (bucket != null)
+			foreach (var pair in bucket)
+				if(pair.Key!.Equals(key))
+					return true;
+		
+		return false;
+	}
+
+	public bool Remove(TKey  key)
+	{
+		int index = GetBucketIndex(key);
+		var bucket = _buckets[index];
+
+		if (bucket != null)
+		{
+			var node = bucket.First;
+			while (node != null)
+			{
+				if (node.Value.Key!.Equals(key))
+				{
+					bucket.Remove(node);
+					Count--;
+					return true;
+				}
+				node = node.Next;
+			}
+		}
+
+		return false;
+	}
 	
 }
