@@ -1,6 +1,8 @@
-﻿namespace CSharpDictionary.Core;
+﻿using System.Collections;
 
-public class MyDictionary<TKey , Tvalue>
+namespace CSharpDictionary.Core;
+
+public class MyDictionary<TKey , Tvalue> : IEnumerable<KeyValuePair<TKey, Tvalue>>
 {
 	private const int DefaultCapacity = 16;
 	private const double LoadFactor = 0.75f; 
@@ -13,6 +15,22 @@ public class MyDictionary<TKey , Tvalue>
 	public MyDictionary()
 	{
 		_buckets = new LinkedList<KeyValuePair<TKey , Tvalue>>[DefaultCapacity];
+	}
+	
+	public IEnumerator<KeyValuePair<TKey, Tvalue>> GetEnumerator()
+	{
+		foreach (var bucket in _buckets)
+		{
+			if (bucket == null) continue;
+
+			foreach (var pair in bucket)
+				yield return pair;
+		}
+	}
+
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return GetEnumerator();
 	}
 
 	private int GetBucketIndex(TKey  key)
@@ -99,4 +117,6 @@ public class MyDictionary<TKey , Tvalue>
 			}
 		}
 	}
+
+	
 }
