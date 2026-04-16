@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CSharpDictionary.Core/CSharpDictionary.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CSharpDictionary.Tests/CSharpDictionary.Tests.csproj" />
+  </Folder>
+</Solution>
