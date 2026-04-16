@@ -60,4 +60,18 @@ public class MyDictionaryTests
         var dict = new MyDictionary<string, int>();
         Assert.False(dict.Remove("ghost"));
     }
+    
+    [Fact]
+    public void Add_ManyItems_ResizesAndPreservesAllValues()
+    {
+        var dict = new MyDictionary<string, int>();
+
+        for (int i = 0; i < 20; i++)
+            dict.Add($"key{i}", i);
+
+        Assert.Equal(20, dict.Count);
+
+        for (int i = 0; i < 20; i++)
+            Assert.Equal(i, dict.Get($"key{i}"));
+    }
 }
