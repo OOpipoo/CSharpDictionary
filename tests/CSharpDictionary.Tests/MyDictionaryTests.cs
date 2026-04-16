@@ -74,4 +74,22 @@ public class MyDictionaryTests
         for (int i = 0; i < 20; i++)
             Assert.Equal(i, dict.Get($"key{i}"));
     }
+    
+    [Fact]
+    public void Foreach_IteratesAllPairs()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("a", 1);
+        dict.Add("b", 2);
+        dict.Add("c", 3);
+
+        var result = new System.Collections.Generic.Dictionary<string, int>();
+        foreach (var pair in dict)
+            result[pair.Key] = pair.Value;
+
+        Assert.Equal(3, result.Count);
+        Assert.Equal(1, result["a"]);
+        Assert.Equal(2, result["b"]);
+        Assert.Equal(3, result["c"]);
+    }
 }
