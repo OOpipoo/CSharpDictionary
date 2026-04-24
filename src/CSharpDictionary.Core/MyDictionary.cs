@@ -16,6 +16,32 @@ public class MyDictionary<TKey , TValue> : IEnumerable<KeyValuePair<TKey, TValue
 	{
 		_buckets = new LinkedList<KeyValuePair<TKey , TValue>>[DefaultCapacity];
 	}
+
+	public IEnumerable<TKey> Keys
+	{
+		get
+		{
+			foreach (var bucket  in _buckets)
+			{
+				if(bucket == null)continue;
+				foreach (var pair in bucket)
+					yield return pair.Key;
+			}
+		}
+	}
+
+	public IEnumerable<TValue> Values
+	{
+		get
+		{
+			foreach (var bucket in _buckets)
+			{
+				if (bucket == null) continue;
+				foreach (var pair in bucket)
+					yield return pair.Value;
+			}
+		}
+	}
 	
 	public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
 	{
