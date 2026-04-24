@@ -92,4 +92,31 @@ public class MyDictionaryTests
         Assert.Equal(2, result["b"]);
         Assert.Equal(3, result["c"]);
     }
+
+    [Fact]
+    public void Indexer_Get_ReturnsCorrectValue()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 42);
+        Assert.Equal(42, dict["key"]);
+    }
+
+    [Fact]
+    public void Indexer_Set_AddsNewPair()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict["key"] = 42;
+        Assert.Equal(42, dict.Get("key"));
+        Assert.Equal(1, dict.Count);
+    }
+
+    [Fact]
+    public void Indexer_Set_UpdateExisingValue()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict["key"] = 42;
+        dict["key"] = 99;
+        Assert.Equal(99, dict["key"]);
+        Assert.Equal(1, dict.Count);
+    }
 }
