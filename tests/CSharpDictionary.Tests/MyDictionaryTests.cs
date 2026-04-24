@@ -136,4 +136,23 @@ public class MyDictionaryTests
         try { dict.Add("key", 2); } catch { }
         Assert.Equal(1, dict.Count);
     }
+    
+    [Fact]
+    public void TryGetValue_ExistingKey_ReturnsTrueAndValue()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 42);
+        bool result = dict.TryGetValue("key", out int value);
+        Assert.True(result);
+        Assert.Equal(42, value);
+    }
+
+    [Fact]
+    public void TryGetValue_MissingKey_ReturnsFalse()
+    {
+        var dict = new MyDictionary<string, int>();
+        bool result = dict.TryGetValue("missing", out int value);
+        Assert.False(result);
+        Assert.Equal(0, value);
+    }
 }
