@@ -1,4 +1,5 @@
 ﻿using CSharpDictionary.Core;
+using System.Linq;
 
 namespace CSharpDictionary.Tests;
 
@@ -154,5 +155,35 @@ public class MyDictionaryTests
         bool result = dict.TryGetValue("missing", out int value);
         Assert.False(result);
         Assert.Equal(0, value);
+    }
+    
+    [Fact]
+    public void Keys_ReturnsAllKeys()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("a", 1);
+        dict.Add("b", 2);
+        dict.Add("c", 3);
+
+        var keys = dict.Keys.ToList();
+        Assert.Equal(3, keys.Count);
+        Assert.Contains("a", keys);
+        Assert.Contains("b", keys);
+        Assert.Contains("c", keys);
+    }
+
+    [Fact]
+    public void Values_ReturnsAllValues()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("a", 1);
+        dict.Add("b", 2);
+        dict.Add("c", 3);
+
+        var values = dict.Values.ToList();
+        Assert.Equal(3, values.Count);
+        Assert.Contains(1, values);
+        Assert.Contains(2, values);
+        Assert.Contains(3, values);
     }
 }
