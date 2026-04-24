@@ -68,7 +68,25 @@ public class MyDictionary<TKey , TValue> : IEnumerable<KeyValuePair<TKey, TValue
 		throw new KeyNotFoundException($"Key {key} not found");
 	}
 
+	public bool TryGetValue(TKey key, out TValue ? value)
+	{
+		int index = GetBucketIndex(key);
+		var bucket = _buckets[index];
 
+		if (bucket != null)
+		{
+			foreach (var pair in bucket)
+				if (pair.Key!.Equals(key))
+				{
+					value = pair.Value;
+					return true;
+				}
+		}
+
+		value = default;
+		return false;
+	}
+	
 	public TValue this[TKey key]
 	{
 		get => Get(key);
