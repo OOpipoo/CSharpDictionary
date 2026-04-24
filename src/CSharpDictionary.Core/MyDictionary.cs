@@ -2,22 +2,48 @@
 
 namespace CSharpDictionary.Core;
 
-public class MyDictionary<TKey , Tvalue> : IEnumerable<KeyValuePair<TKey, Tvalue>>
+public class MyDictionary<TKey , TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
 {
 	private const int DefaultCapacity = 16;
 	private const double LoadFactor = 0.75f; 
 
-	private LinkedList<KeyValuePair<TKey , Tvalue>> ?[] _buckets;
+	private LinkedList<KeyValuePair<TKey , TValue>> ?[] _buckets;
 	
 	public int Count { get; private set; }
 	
 	
 	public MyDictionary()
 	{
-		_buckets = new LinkedList<KeyValuePair<TKey , Tvalue>>[DefaultCapacity];
+		_buckets = new LinkedList<KeyValuePair<TKey , TValue>>[DefaultCapacity];
+	}
+
+	public IEnumerable<TKey> Keys
+	{
+		get
+		{
+			foreach (var bucket  in _buckets)
+			{
+				if(bucket == null)continue;
+				foreach (var pair in bucket)
+					yield return pair.Key;
+			}
+		}
+	}
+
+	public IEnumerable<TValue> Values
+	{
+		get
+		{
+			foreach (var bucket in _buckets)
+			{
+				if (bucket == null) continue;
+				foreach (var pair in bucket)
+					yield return pair.Value;
+			}
+		}
 	}
 	
-	public IEnumerator<KeyValuePair<TKey, Tvalue>> GetEnumerator()
+	public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
 	{
 		foreach (var bucket in _buckets)
 		{
@@ -39,12 +65,15 @@ public class MyDictionary<TKey , Tvalue> : IEnumerable<KeyValuePair<TKey, Tvalue
 		return Math.Abs(hash) % _buckets.Length;
 	}
 
-	public void Add(TKey  key, Tvalue value)
+	public void Add(TKey  key, TValue value)
 	{
+		if (ContainsKey(key))
+			throw new ArgumentException($"An item with the key '{key}' has already been added.");
+		
 		int index = GetBucketIndex(key);
 
-		_buckets[index] ??= new LinkedList<KeyValuePair<TKey , Tvalue>>();
-		_buckets[index]!.AddLast(new KeyValuePair<TKey , Tvalue>(key, value));
+		_buckets[index] ??= new LinkedList<KeyValuePair<TKey , TValue>>();
+		_buckets[index]!.AddLast(new KeyValuePair<TKey , TValue>(key, value));
 		
 		Count++;
 		
@@ -52,7 +81,7 @@ public class MyDictionary<TKey , Tvalue> : IEnumerable<KeyValuePair<TKey, Tvalue
 			Resize();
 	}
 
-	public Tvalue Get(TKey  key)
+	public TValue Get(TKey  key)
 	{
 		int index = GetBucketIndex(key);
 		var bucket = _buckets[index];
@@ -63,6 +92,53 @@ public class MyDictionary<TKey , Tvalue> : IEnumerable<KeyValuePair<TKey, Tvalue
 					return pair.Value;
 
 		throw new KeyNotFoundException($"Key {key} not found");
+	}
+
+	public bool TryGetValue(TKey key, out TValue ? value)
+	{
+		int index = GetBucketIndex(key);
+		var bucket = _buckets[index];
+
+		if (bucket != null)
+		{
+			foreach (var pair in bucket)
+				if (pair.Key!.Equals(key))
+				{
+					value = pair.Value;
+					return true;
+				}
+		}
+
+		value = default;
+		return false;
+	}
+	
+	public TValue this[TKey key]
+	{
+		get => Get(key);
+
+		set
+		{
+			int index = GetBucketIndex(key);
+			var bucket = _buckets[index];
+
+			if (bucket != null)
+			{
+				var node = bucket.First;
+				while (node != null)
+				{
+					if (node.Value.Key!.Equals(key))
+					{
+						var update = new KeyValuePair<TKey , TValue>(key, value);
+						node.Value = update;
+						return;
+					}
+					node =  node.Next;
+				}
+			}
+			
+			Add(key, value);
+		}
 	}
 
 	public bool ContainsKey(TKey  key)
@@ -103,7 +179,7 @@ public class MyDictionary<TKey , Tvalue> : IEnumerable<KeyValuePair<TKey, Tvalue
 
 	private void Resize()
 	{
-		var newBuckets = new LinkedList<KeyValuePair<TKey , Tvalue>>?[_buckets.Length * 2];
+		var newBuckets = new LinkedList<KeyValuePair<TKey , TValue>>?[_buckets.Length * 2];
 
 		foreach (var bucket in _buckets)
 		{
@@ -112,7 +188,7 @@ public class MyDictionary<TKey , Tvalue> : IEnumerable<KeyValuePair<TKey, Tvalue
 			foreach (var pair in bucket)
 			{
 				int newIndex = Math.Abs(pair.Key!.GetHashCode()) % newBuckets.Length;
-				newBuckets[newIndex] ??= new LinkedList<KeyValuePair<TKey , Tvalue>>();
+				newBuckets[newIndex] ??= new LinkedList<KeyValuePair<TKey , TValue>>();
 				newBuckets[newIndex]!.AddLast(pair);
 			}
 		}

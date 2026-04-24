@@ -1,4 +1,5 @@
 ﻿using CSharpDictionary.Core;
+using System.Linq;
 
 namespace CSharpDictionary.Tests;
 
@@ -91,5 +92,98 @@ public class MyDictionaryTests
         Assert.Equal(1, result["a"]);
         Assert.Equal(2, result["b"]);
         Assert.Equal(3, result["c"]);
+    }
+
+    [Fact]
+    public void Indexer_Get_ReturnsCorrectValue()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 42);
+        Assert.Equal(42, dict["key"]);
+    }
+
+    [Fact]
+    public void Indexer_Set_AddsNewPair()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict["key"] = 42;
+        Assert.Equal(42, dict.Get("key"));
+        Assert.Equal(1, dict.Count);
+    }
+
+    [Fact]
+    public void Indexer_Set_UpdateExisingValue()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict["key"] = 42;
+        dict["key"] = 99;
+        Assert.Equal(99, dict["key"]);
+        Assert.Equal(1, dict.Count);
+    }
+    
+    [Fact]
+    public void Add_DuplicateKey_ThrowsArgumentException()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 1);
+        Assert.Throws<ArgumentException>(() => dict.Add("key", 2));
+    }
+
+    [Fact]
+    public void Add_DuplicateKey_DoesNotIncrementCount()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 1);
+        try { dict.Add("key", 2); } catch { }
+        Assert.Equal(1, dict.Count);
+    }
+    
+    [Fact]
+    public void TryGetValue_ExistingKey_ReturnsTrueAndValue()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 42);
+        bool result = dict.TryGetValue("key", out int value);
+        Assert.True(result);
+        Assert.Equal(42, value);
+    }
+
+    [Fact]
+    public void TryGetValue_MissingKey_ReturnsFalse()
+    {
+        var dict = new MyDictionary<string, int>();
+        bool result = dict.TryGetValue("missing", out int value);
+        Assert.False(result);
+        Assert.Equal(0, value);
+    }
+    
+    [Fact]
+    public void Keys_ReturnsAllKeys()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("a", 1);
+        dict.Add("b", 2);
+        dict.Add("c", 3);
+
+        var keys = dict.Keys.ToList();
+        Assert.Equal(3, keys.Count);
+        Assert.Contains("a", keys);
+        Assert.Contains("b", keys);
+        Assert.Contains("c", keys);
+    }
+
+    [Fact]
+    public void Values_ReturnsAllValues()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("a", 1);
+        dict.Add("b", 2);
+        dict.Add("c", 3);
+
+        var values = dict.Values.ToList();
+        Assert.Equal(3, values.Count);
+        Assert.Contains(1, values);
+        Assert.Contains(2, values);
+        Assert.Contains(3, values);
     }
 }
