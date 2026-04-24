@@ -41,6 +41,9 @@ public class MyDictionary<TKey , TValue> : IEnumerable<KeyValuePair<TKey, TValue
 
 	public void Add(TKey  key, TValue value)
 	{
+		if (ContainsKey(key))
+			throw new ArgumentException($"An item with the key '{key}' has already been added.");
+		
 		int index = GetBucketIndex(key);
 
 		_buckets[index] ??= new LinkedList<KeyValuePair<TKey , TValue>>();

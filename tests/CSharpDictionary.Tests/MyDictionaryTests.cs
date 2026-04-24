@@ -119,4 +119,21 @@ public class MyDictionaryTests
         Assert.Equal(99, dict["key"]);
         Assert.Equal(1, dict.Count);
     }
+    
+    [Fact]
+    public void Add_DuplicateKey_ThrowsArgumentException()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 1);
+        Assert.Throws<ArgumentException>(() => dict.Add("key", 2));
+    }
+
+    [Fact]
+    public void Add_DuplicateKey_DoesNotIncrementCount()
+    {
+        var dict = new MyDictionary<string, int>();
+        dict.Add("key", 1);
+        try { dict.Add("key", 2); } catch { }
+        Assert.Equal(1, dict.Count);
+    }
 }
